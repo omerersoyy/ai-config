@@ -1,25 +1,26 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node
 
-const [, , ...args] = process.argv;
+import { isSupported } from "../core/supported";
+import { log } from "../lib/logger";
+import type { ProjectType, Tool } from "../types";
+import { resolveConfig } from "../core/resolver"; 
+
+const args = process.argv.slice(2);
 
 if (args.length !== 2) {
-  console.error("❌ Usage: npx ai-config <project-type> <tool>");
+  log.error("Usage: npx ai-config <project> <tool>");
   process.exit(1);
 }
 
-const [projectType, tool] = args;
+const [projectArg, toolArg] = args;
+const project = projectArg as ProjectType;
+const tool = toolArg as Tool;
 
-const supportedProjects = ["react", "react-native", "node", "next"];
-const supportedTools = ["jest", "eslint", "prettier", "vitest"];
-
-if (!supportedProjects.includes(projectType)) {
-  console.error(`❌ Unsopperted project type: ${projectType}`);
-  process.exit(1);
-}
-
-if (!supportedTools.includes(tool)) {
-  console.error(`❌ Unsopperted tool: ${tool}`);
-  process.exit(1);
-}
-
-console.log(`🚀 ${projectType} ${tool} config in progress ...`);
+resolveConfig({ project, tool })
+  .then(() => {
+    log.success("Completed!");
+  })
+  .catch((err: { message: any; }) => {
+    log.error(`Error: ${err.message}`);
+    process.exit(1);
+  });
