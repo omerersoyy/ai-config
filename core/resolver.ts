@@ -1,26 +1,124 @@
-import type { ProjectType, Tool } from "../types";
+import {
+	isSupported,
+	isSupportedProject,
+	isSupportedTool,
+} from "../core/supported";
 import { log } from "../lib/logger";
-import { isSupportedProject, isSupportedTool } from "./supported";
+import {
+	InfoType,
+	type ProjectType,
+	type Tool,
+	type ToolResponses,
+} from "../types";
 
-type ResolverInput = {
-  project: ProjectType;
-  tool: Tool;
-};
+export async function resolveConfig(project: ProjectType, tool: Tool) {
+	if (!isSupportedProject(project)) {
+		throw new Error(`❌ Unsupported project type: "${project}"`);
+	}
 
-export async function resolveConfig({ project, tool }: ResolverInput) {
-  if (!isSupportedProject(project)) {
-    log.error(`❌ Not supported: ${project}`);
-    process.exit(1);
-  }
+	if (!isSupportedTool(tool)) {
+		throw new Error(`❌ Unsupported tool: "${tool}"`);
+	}
 
-  if (!isSupportedTool(tool)) {
-    log.error(`❌ Not supported: ${tool}`);
-    process.exit(1);
-  }
+	if (!isSupported(project, tool)) {
+		throw new Error(
+			`❌ The tool "${tool}" is not supported for project type "${project}"`
+		);
+	}
 
-  log.info(`🧠 Configuring ${tool}, for your ${project} project`);
+	log.info(
+		`${InfoType.IN_PROGRESS}: Fetching recommended config for ${project} + ${tool}...`
+	);
 
-  await new Promise((res) => setTimeout(res, 1000)); 
+	const result = fakeLLMResponses[project as ProjectType]!![tool as Tool];
 
-  log.success(`🧠 Configured ${tool}, for your ${project} project`);
+	return {
+		filename: getFilename(tool as Tool),
+		content: result,
+	};
 }
+
+function getFilename(tool: Tool): string {
+	switch (tool) {
+		case "jest":
+			return "jest.config.js";
+		case "eslint":
+			return ".eslintrc.js";
+		case "prettier":
+			return ".prettierrc";
+		default:
+			return "config.generated.js";
+	}
+}
+
+export async function getConfigFromLLM(
+	project: ProjectType,
+	tool: Tool
+): Promise<string | null> {
+	if (!isSupported(project, tool)) {
+		return null;
+	}
+
+	const config = fakeLLMResponses[project]?.[tool];
+	return config || null;
+}
+
+const fakeLLMResponses: Partial<Record<ProjectType, ToolResponses>> = {
+	react: {
+		jest: `// jest.config.js
+module.exports = {
+  testEnvironment: "jsdom",
+  transform: {
+    "^.+\\\\.tsx?$": "babel-jest"
+  }
+};`,
+		eslint: `// .eslintrc.js
+module.exports = {
+  extends: ["react-app", "eslint:recommended"]
+};`,
+		prettier: `// .prettierrc
+{
+  "semi": true,
+  "singleQuote": true
+}`,
+		vitest: "",
+	},
+	"react-native": {
+		jest: `// jest.config.js
+module.exports = {
+  preset: "react-native",
+  transformIgnorePatterns: ["node_modules/(?!react-native)"]
+};`,
+	},
+	node: {
+		eslint: `// .eslintrc.js
+module.exports = {
+  env: { node: true },
+  extends: ["eslint:recommended"]
+};`,
+		prettier: `// .prettierrc
+{
+  "tabWidth": 2
+}`,
+		jest: "",
+		vitest: "",
+	},
+	next: {
+		jest: `// jest.config.js
+module.exports = {
+  testEnvironment: "jsdom",
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/$1"
+  }
+};`,
+		eslint: `// .eslintrc.js
+module.exports = {
+  extends: ["next/core-web-vitals"]
+};`,
+		prettier: `// .prettierrc
+{
+  "printWidth": 80
+}`,
+		vitest: "",
+	},
+};
