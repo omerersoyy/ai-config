@@ -3,10 +3,12 @@ export type ProjectType =
 	| "react-native"
 	| "node"
 	| "next"
+	| "nestjs"
 	| "vue"
 	| "angular"
 	| "express"
-	| "svelte";
+	| "svelte"
+	| "gatsby";
 
 export type Tool =
 	| "jest"
