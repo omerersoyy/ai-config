@@ -2,12 +2,14 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "Node",
+    "outDir": "dist",
+    "rootDir": ".",
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
-    "outDir": "dist"
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true
   },
-  "include": ["cli"]
+  "include": ["cli", "core", "lib", "types"]
 }

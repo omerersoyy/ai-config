@@ -1,22 +1,29 @@
 {
-  "name": "ai-config",
-  "version": "1.0.0",
-  "main": "cli/index.ts",
+  "name": "ai-config-generator",
+  "version": "0.1.3-beta",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
   "bin": {
-    "ai-config": "dist/index.js"
+    "ai-config": "dist/cli/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@types/node": "^22.14.0",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.19.3",
-    "typescript": "^5.8.3"
+    "@types/node": "^22.14.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -1,4 +1,4 @@
-import type { ProjectType, Tool } from "../types";
+import type { ProjectType, Tool } from "../types/index.js";
 
 export const supportedCombos: Record<ProjectType, Tool[]> = {
 	react: [

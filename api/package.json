@@ -1,0 +1,16 @@
+{
+	"name": "ai-config-api",
+	"version": "0.1.0",
+	"type": "module",
+	"main": "handler.ts",
+	"dependencies": {
+		"@vercel/node": "^5.1.14"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": ""
+}
